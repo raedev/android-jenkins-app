@@ -1,0 +1,66 @@
+plugins {
+    id 'com.android.application'
+}
+
+Properties properties = new Properties()
+properties.load(new FileInputStream(rootProject.file("local.properties")))
+def jenkinsUrl = properties.getProperty('jenkins.url')
+def jenkinsProxy = properties.getProperty('jenkins.proxy')
+
+android {
+    compileSdk 31
+
+    defaultConfig {
+        applicationId "com.jenkins.android"
+        minSdk 21
+        targetSdk 31
+        versionCode 1
+        versionName "1.0"
+        buildConfigField 'String', 'JENKINS_URL', "\"${jenkinsUrl}\""
+        buildConfigField 'String', 'JENKINS_PROXY', "\"${jenkinsProxy}\""
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    sourceSets {
+        main {
+            assets {
+                srcDirs 'src/main/assets'
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
+    implementation 'com.liulishuo.filedownloader:library:1.7.7'
+
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+
+    // 包含大部分基础代码
+    implementation 'com.github.raedev:swift:1.0.2'
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7'
+
+    // RxAndroid
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.1'
+    implementation 'com.trello.rxlifecycle4:rxlifecycle-android-lifecycle:4.0.2'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
+}
