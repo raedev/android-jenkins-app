@@ -45,6 +45,7 @@ public class AppInfo implements Parcelable {
         downloadId = in.readInt();
         progress = in.readInt();
         currentVersionName = in.readString();
+        hasDownload = in.readByte() != 0;
     }
 
     @Override
@@ -62,6 +63,7 @@ public class AppInfo implements Parcelable {
         dest.writeInt(downloadId);
         dest.writeInt(progress);
         dest.writeString(currentVersionName);
+        dest.writeByte((byte) (hasDownload ? 1 : 0));
     }
 
     @Override

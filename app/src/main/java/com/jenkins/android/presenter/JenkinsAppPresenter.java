@@ -43,16 +43,20 @@ public class JenkinsAppPresenter extends BasePresenter<JenkinsAppContract.View> 
         Observable.create((ObservableOnSubscribe<List<AppInfo>>) emitter -> {
             List<AppInfo> data = mJenkinsDataSource.queryAppList().blockingFirst();
             for (AppInfo item : data) {
-                // query job
-                JobBean job = mJenkinsApi.queryJob(item.jobName).blockingFirst();
-                // query detail
-                JobDetailBean detail = mJenkinsApi.queryJobDetail(item.jobName, String.valueOf(job.getLastSuccessBuildNumber())).blockingFirst();
-                item.buildNumber = detail.id;
-                item.log = detail.getLog();
-                item.downloadUrl = detail.getDownloadUrl();
-                item.buildDate = detail.getBuildDate();
-                item.currentVersionName = AppUtils.getAppVersionName(item.packageName);
-                item.hasDownload = ApkDownloadManager.getApkFile(item).exists();
+                try {
+                    // query job
+                    JobBean job = mJenkinsApi.queryJob(item.jobName).blockingFirst();
+                    // query detail
+                    JobDetailBean detail = mJenkinsApi.queryJobDetail(item.jobName, String.valueOf(job.getLastSuccessBuildNumber())).blockingFirst();
+                    item.buildNumber = detail.id;
+                    item.log = detail.getLog();
+                    item.downloadUrl = detail.getDownloadUrl();
+                    item.buildDate = detail.getBuildDate();
+                    item.currentVersionName = AppUtils.getAppVersionName(item.packageName);
+                    item.hasDownload = ApkDownloadManager.getApkFile(item).exists();
+                } catch (Exception e) {
+                    Log.e("rae", "加载Job异常：" + e, e);
+                }
             }
             Collections.sort(data, (o1, o2) -> Collator.getInstance().compare(o1.title, o2.title));
             emitter.onNext(data);
