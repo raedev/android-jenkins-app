@@ -15,7 +15,6 @@ import com.jenkins.android.model.AppInfo;
 import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadListener;
 import com.liulishuo.filedownloader.FileDownloader;
-import com.liulishuo.filedownloader.util.FileDownloadUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -67,7 +66,7 @@ public final class ApkDownloadManager extends FileDownloadListener {
             task.setForceReDownload(false);
             task.setWifiRequired(true);
             task.setCallbackProgressMinInterval(500);
-            task.setPath(apk.getParent(), true);
+            task.setPath(getApkTempFile(item).getPath(), false);
             task.setTag(item);
             // query file length
             item.fileLength = ApiFactory.getInstance().queryContentLength(item.downloadUrl);
@@ -119,6 +118,7 @@ public final class ApkDownloadManager extends FileDownloadListener {
             error(task, new FileNotFoundException("下载文件不存在：" + tag));
             return;
         }
+
         File file = getApkFile(tag);
         FileUtils.move(tag.filePath, file.getPath());
         tag.filePath = file.getPath();
@@ -155,9 +155,28 @@ public final class ApkDownloadManager extends FileDownloadListener {
 
     // endregion
 
+    /**
+     * 下载完成的文件名
+     * @param m
+     * @return
+     */
     public static File getApkFile(AppInfo m) {
         File dir = new File(Environment.getExternalStorageDirectory(), "Jenkins");
         FileUtils.createOrExistsDir(dir);
-        return new File(dir, FileDownloadUtils.md5(m.downloadUrl) + ".apk");
+        String downloadUrl = m.downloadUrl;
+        int index = downloadUrl.lastIndexOf("/");
+        String fileName = downloadUrl.substring(index + 1);
+        return new File(dir, fileName);
     }
+
+    /**
+     * 下载中的文件名
+     * @param m
+     * @return
+     */
+    public static File getApkTempFile(AppInfo m) {
+        return new File(getApkFile(m).getPath() + ".jenkins");
+    }
+
+
 }
